@@ -439,7 +439,7 @@ namespace NPOI.XSSF.UserModel
             for (int i = 0; i < size; i++)
             {
                 CellRangeAddress region = regions[i];
-                foreach (CellRangeAddress other in regions.Skip(i)) //regions.subList(i+1, regions.size()
+                foreach (CellRangeAddress other in regions.Skip(i+1)) //regions.subList(i+1, regions.size()
                 {
                     if (region.Intersects(other))
                     {
@@ -2896,11 +2896,11 @@ namespace NPOI.XSSF.UserModel
                     if (row.GetCTRow().outlineLevel == ((XSSFRow)GetRow(i)).GetCTRow()
                             .outlineLevel)
                     {
-                        ((XSSFRow)GetRow(i)).GetCTRow().unsetHidden();
+                        ((XSSFRow)GetRow(i)).GetCTRow().UnsetHidden();
                     }
                     else if (!IsRowGroupCollapsed(i))
                     {
-                        ((XSSFRow)GetRow(i)).GetCTRow().unsetHidden();
+                        ((XSSFRow)GetRow(i)).GetCTRow().UnsetHidden();
                     }
                 }
             }
@@ -3752,7 +3752,7 @@ namespace NPOI.XSSF.UserModel
             out1.Close();
         }
 
-        internal virtual void Write(Stream stream)
+        internal virtual void Write(Stream stream, bool leaveOpen=false)
         {
             bool setToNull = false;
             if (worksheet.sizeOfColsArray() == 1)
@@ -3804,7 +3804,7 @@ namespace NPOI.XSSF.UserModel
             map[ST_RelationshipId.NamespaceURI] = "r";
             //xmlOptions.SetSaveSuggestedPrefixes(map);
 
-            new WorksheetDocument(worksheet).Save(stream);
+            new WorksheetDocument(worksheet).Save(stream, leaveOpen);
 
             // Bug 52233: Ensure that we have a col-array even if write() removed it
             if (setToNull)
@@ -4773,10 +4773,11 @@ namespace NPOI.XSSF.UserModel
 
             try
             {
-                using (MemoryStream out1 = new MemoryStream())
+                using (MemoryStream ms = RecyclableMemory.GetStream())
                 {
-                    this.Write(out1);
-                    clonedSheet.Read(new MemoryStream(out1.ToArray()));
+                    this.Write(ms, true);
+                    ms.Position = 0;
+                    clonedSheet.Read(ms);
                 }
             }
             catch (IOException e)
@@ -4805,7 +4806,7 @@ namespace NPOI.XSSF.UserModel
                     continue;
                 }
                 //skip printerSettings.bin part
-                if (r.GetPackagePart().PartName.Name == "/xl/printerSettings/printerSettings1.bin")
+                if (r.GetPackagePart().PartName.Name.StartsWith("/xl/printerSettings/printerSettings"))
                     continue;
                 PackageRelationship rel = r.GetPackageRelationship();
                 clonedSheet.GetPackagePart().AddRelationship(
@@ -4986,7 +4987,7 @@ namespace NPOI.XSSF.UserModel
             if (!srcRow.GetCTRow().IsSetCustomHeight())
             {
                 //Copying height sets the custom height flag, but Excel will set a value for height even if it's auto-sized.
-                destRow.GetCTRow().unSetCustomHeight();
+                destRow.GetCTRow().UnsetCustomHeight();
             }
             destRow.Hidden = srcRow.Hidden;
             destRow.Collapsed = srcRow.Collapsed;
@@ -5424,7 +5425,53 @@ namespace NPOI.XSSF.UserModel
             }
             return result;
         }
+        /**
+ *  when a cell with a 'master' shared formula is removed,  the next cell in the range becomes the master
+ * @param cell The cell that is removed
+ * @param evalWb BaseXSSFEvaluationWorkbook in use, if one exists
+ */
+        internal void OnDeleteFormula(XSSFCell cell, XSSFEvaluationWorkbook evalWb)
+        {
 
+            CT_CellFormula f = cell.GetCTCell().f;
+            if (f != null && f.t == ST_CellFormulaType.shared && f.isSetRef() && f.Value != null)
+            {
+                bool breakit = false;
+                CellRangeAddress ref1 = CellRangeAddress.ValueOf(f.@ref);
+                if (ref1.NumberOfCells > 1)
+                {
+                    for (int i = cell.RowIndex; i <= ref1.LastRow; i++)
+                    {
+                        XSSFRow row = (XSSFRow)GetRow(i);
+                        if (row != null)
+                        {
+                            for (int j = cell.ColumnIndex; j <= ref1.LastColumn; j++)
+                            {
+                                XSSFCell nextCell = (XSSFCell)row.GetCell(j);
+                                if (nextCell != null && nextCell != cell && nextCell.CellType == CellType.Formula)
+                                {
+                                    CT_CellFormula nextF = nextCell.GetCTCell().f;
+                                    if (nextF.t == ST_CellFormulaType.shared && nextF.si == f.si)
+                                    {
+                                        nextF.Value = nextCell.GetCellFormula(evalWb);
+                                        CellRangeAddress nextRef = new CellRangeAddress(
+                                                nextCell.RowIndex, ref1.LastRow,
+                                                nextCell.ColumnIndex, ref1.LastColumn);
+                                        nextF.@ref=nextRef.FormatAsString();
+
+                                        sharedFormulas[(int)nextF.si]= nextF;
+                                        breakit = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (breakit)
+                                break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }

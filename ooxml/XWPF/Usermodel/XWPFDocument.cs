@@ -48,7 +48,7 @@ namespace NPOI.XWPF.UserModel
         /**
          * Keeps track on all id-values used in this document and included parts, like headers, footers, etc.
          */
-        private IdentifierManager drawingIdManager = new IdentifierManager(1L, 4294967295L);
+        private IdentifierManager drawingIdManager = new IdentifierManager(0L, 4294967295L);
         protected List<XWPFFooter> footers = new List<XWPFFooter>();
         protected List<XWPFHeader> headers = new List<XWPFHeader>();
         protected List<XWPFComment> comments = new List<XWPFComment>();
@@ -214,7 +214,7 @@ namespace NPOI.XWPF.UserModel
                 while (relIter.MoveNext())
                 {
                     PackageRelationship rel = relIter.Current;
-                    hyperlinks.Add(new XWPFHyperlink(rel.Id, rel.TargetUri.ToString()));
+                    hyperlinks.Add(new XWPFHyperlink(rel.Id, rel.TargetUri.OriginalString));
                 }
             }
             catch (InvalidDataException e)
@@ -238,7 +238,7 @@ namespace NPOI.XWPF.UserModel
                    EndnotesDocument endnotesDocument = EndnotesDocument.Parse(xmldoc, NamespaceManager);
                    foreach (CT_FtnEdn ctFtnEdn in endnotesDocument.Endnotes.endnote)
                    {
-                       endnotes.Add(Int32.Parse(ctFtnEdn.id), new XWPFFootnote(this, ctFtnEdn));
+                       endnotes.Add(ctFtnEdn.id, new XWPFFootnote(this, ctFtnEdn));
                    }
                }
             }
@@ -966,8 +966,41 @@ namespace NPOI.XWPF.UserModel
         public XWPFFootnote AddEndnote(CT_FtnEdn note)
         {
             XWPFFootnote endnote = new XWPFFootnote(this, note);
-            endnotes.Add(int.Parse(note.id), endnote);
+            endnotes.Add(note.id, endnote);
             return endnote;
+        }
+
+        /// <summary>
+        /// Create a new footnote and add it to the document.
+        /// </summary>
+        /// <remarks>
+        /// The new note will have one paragraph with the style "FootnoteText"
+        /// and one run containing the required footnote reference with the
+        /// style "FootnoteReference".
+        /// </remarks>
+        /// <returns>New XWPFFootnote.</returns>
+        public XWPFFootnote CreateFootnote()
+        {
+            XWPFFootnotes footnotes = this.CreateFootnotes();
+
+            XWPFFootnote footnote = footnotes.CreateFootnote();
+            return footnote;
+        }
+        /// <summary>
+        /// Remove the specified footnote if present.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <returns></returns>
+        public bool RemoveFootnote(int pos)
+        {
+            if (null != footnotes)
+            {
+                return footnotes.RemoveFootnote(pos);
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /**

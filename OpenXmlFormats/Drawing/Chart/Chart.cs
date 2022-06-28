@@ -74,6 +74,8 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
                     ctObj.lang = CT_TextLanguageID.Parse(childNode, namespaceManager);
                 else if (childNode.LocalName == "roundedCorners")
                     ctObj.roundedCorners = CT_Boolean.Parse(childNode, namespaceManager);
+                else if (childNode.LocalName == "AlternateContent")
+                    ctObj.alternateContent = Vml.CT_AlternateContent.Parse(childNode, namespaceManager);
                 else if (childNode.LocalName == "style")
                     ctObj.style = CT_Style.Parse(childNode, namespaceManager);
                 else if (childNode.LocalName == "clrMapOvr")
@@ -117,6 +119,8 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
                     this.lang.Write(sw, "lang");
                 if (this.roundedCorners != null)
                     this.roundedCorners.Write(sw, "roundedCorners");
+                if (this.alternateContent != null)
+                    this.alternateContent.Write(sw, "AlternateContent");
                 if (this.style != null)
                     this.style.Write(sw, "style");
                 if (this.clrMapOvr != null)
@@ -194,6 +198,19 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
             set
             {
                 this.roundedCornersField = value;
+            }
+        }
+
+        Vml.CT_AlternateContent alternateContentField = null;
+        public Vml.CT_AlternateContent alternateContent
+        {
+            get
+            {
+                return alternateContentField;
+            }
+            set
+            {
+                this.alternateContentField = value;
             }
         }
 
@@ -428,8 +445,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "r:id", this.id);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
     }
@@ -513,8 +529,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
             XmlHelper.WriteAttribute(sw, "horizontalDpi", this.horizontalDpi);
             XmlHelper.WriteAttribute(sw, "verticalDpi", this.verticalDpi);
             XmlHelper.WriteAttribute(sw, "copies", this.copies);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -711,8 +726,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
             XmlHelper.WriteAttribute(sw, "b", this.b);
             XmlHelper.WriteAttribute(sw, "header", this.header);
             XmlHelper.WriteAttribute(sw, "footer", this.footer);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -1406,8 +1420,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val, true);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
     }
@@ -1521,8 +1534,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
             sw.Write(string.Format("<c:{0}", nodeName));
             if(this.val!= ST_LegendPos.r)
                 XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
     }
@@ -2220,8 +2232,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
             sw.Write(string.Format("<c:{0}", nodeName));
             if(this.val!= ST_LayoutTarget.outer)
                 XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -2298,8 +2309,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
             sw.Write(string.Format("<c:{0}", nodeName));
             if(this.val!= ST_LayoutMode.factor)
                 XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
     }
@@ -2342,8 +2352,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -2979,8 +2988,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
 
         internal void Write(StreamWriter sw, string nodeName)
         {
-            sw.Write(string.Format("<c:{0}", nodeName));
-            sw.Write(">");
+            sw.Write(string.Format("<c:{0}>", nodeName));
             if (this.logBase != null)
                 this.logBase.Write(sw, "logBase");
             if (this.orientation != null)
@@ -3125,8 +3133,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         private double valField;
@@ -3176,8 +3183,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -3233,8 +3239,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -4066,8 +4071,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         private ST_Crosses valField;
@@ -4128,8 +4132,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -4170,8 +4173,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         private ST_TimeUnit valField;
@@ -4788,8 +4790,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -4833,8 +4834,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -4875,8 +4875,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         private ST_LblAlgn valField;
@@ -5721,8 +5720,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -6678,8 +6676,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
     }
@@ -6768,8 +6765,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
 
@@ -6928,8 +6924,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         private ST_PictureFormat valField;
@@ -6987,8 +6982,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         private double valField;
@@ -7661,8 +7655,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
     }
@@ -8002,8 +7995,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -8072,8 +8064,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val, true);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         public CT_Order()
@@ -8127,8 +8118,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -8538,8 +8528,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         private ST_ErrDir valField;
@@ -8595,8 +8584,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         private ST_ErrBarType valField;
@@ -8668,8 +8656,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -9361,7 +9348,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
 
         private CT_UnsignedInt ptCountField;
 
-        private List<CT_StrVal> lvlField;
+        private List<CT_Lvl> lvlField;
 
         private List<CT_Extension> extLstField;
 
@@ -9370,14 +9357,14 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
             if (node == null)
                 return null;
             CT_MultiLvlStrData ctObj = new CT_MultiLvlStrData();
-            ctObj.lvl = new List<CT_StrVal>();
+            ctObj.lvl = new List<CT_Lvl>();
             ctObj.extLst = new List<CT_Extension>();
             foreach (XmlNode childNode in node.ChildNodes)
             {
                 if (childNode.LocalName == "ptCount")
                     ctObj.ptCount = CT_UnsignedInt.Parse(childNode, namespaceManager);
                 else if (childNode.LocalName == "lvl")
-                    ctObj.lvl.Add(CT_StrVal.Parse(childNode, namespaceManager));
+                    ctObj.lvl.Add(CT_Lvl.Parse(childNode, namespaceManager));
                 else if (childNode.LocalName == "extLst")
                     ctObj.extLst.Add(CT_Extension.Parse(childNode, namespaceManager));
             }
@@ -9392,9 +9379,9 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
             sw.Write(">");
             if (this.ptCount != null)
                 this.ptCount.Write(sw, "ptCount");
-            if (this.lvl != null)
+            if (this.lvl != null && this.lvl.Count > 0)
             {
-                foreach (CT_StrVal x in this.lvl)
+                foreach (CT_Lvl x in this.lvl)
                 {
                     x.Write(sw, "lvl");
                 }
@@ -9427,7 +9414,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         }
 
         [XmlElement(Order = 1)]
-        public List<CT_StrVal> lvl
+        public List<CT_Lvl> lvl
         {
             get
             {
@@ -9714,8 +9701,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -9764,8 +9750,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -9836,8 +9821,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -9887,8 +9871,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -9955,8 +9938,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         private sbyte valField;
@@ -10013,8 +9995,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val.ToString());
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -10286,18 +10267,18 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
                     x.Write(sw, "dateAx");
                 }
             }
-            if (this.catAx != null)
-            {
-                foreach (CT_CatAx x in this.catAx)
-                {
-                    x.Write(sw, "catAx");
-                }
-            }
             if (this.valAx != null)
             {
                 foreach (CT_ValAx x in this.valAx)
                 {
                     x.Write(sw, "valAx");
+                }
+            }
+            if (this.catAx != null)
+            {
+                foreach (CT_CatAx x in this.catAx)
+                {
+                    x.Write(sw, "catAx");
                 }
             }
             if (this.spPr != null)
@@ -10694,8 +10675,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
             sw.Write(string.Format("<c:{0}", nodeName));
             if(this.val!=30)
                 XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         [XmlAttribute]
@@ -10759,8 +10739,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
             sw.Write(string.Format("<c:{0}", nodeName));
             if(valField!=100)
                 XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
     }
@@ -10795,8 +10774,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
 
@@ -10838,8 +10816,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
 
@@ -10895,8 +10872,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
 
@@ -11257,7 +11233,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
 
         private CT_Boolean autoTitleDeletedField;
 
-        private List<CT_PivotFmt> pivotFmtsField;
+        private CT_PivotFmts pivotFmtsField;
 
         private CT_View3D view3DField;
 
@@ -11287,7 +11263,6 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
             if (node == null)
                 return null;
             CT_Chart ctObj = new CT_Chart();
-            ctObj.pivotFmts = new List<CT_PivotFmt>();
             ctObj.extLst = new List<CT_Extension>();
             foreach (XmlNode childNode in node.ChildNodes)
             {
@@ -11295,6 +11270,8 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
                     ctObj.title = CT_Title.Parse(childNode, namespaceManager);
                 else if (childNode.LocalName == "autoTitleDeleted")
                     ctObj.autoTitleDeleted = CT_Boolean.Parse(childNode, namespaceManager);
+                else if (childNode.LocalName == "pivotFmts")
+                    ctObj.pivotFmts = CT_PivotFmts.Parse(childNode, namespaceManager);
                 else if (childNode.LocalName == "view3D")
                     ctObj.view3D = CT_View3D.Parse(childNode, namespaceManager);
                 else if (childNode.LocalName == "floor")
@@ -11313,8 +11290,6 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
                     ctObj.dispBlanksAs = CT_DispBlanksAs.Parse(childNode, namespaceManager);
                 else if (childNode.LocalName == "showDLblsOverMax")
                     ctObj.showDLblsOverMax = CT_Boolean.Parse(childNode, namespaceManager);
-                else if (childNode.LocalName == "pivotFmts")
-                    ctObj.pivotFmts.Add(CT_PivotFmt.Parse(childNode, namespaceManager));
                 else if (childNode.LocalName == "extLst")
                     ctObj.extLst.Add(CT_Extension.Parse(childNode, namespaceManager));
             }
@@ -11331,6 +11306,8 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
                 this.title.Write(sw, "title");
             if (this.autoTitleDeleted != null)
                 this.autoTitleDeleted.Write(sw, "autoTitleDeleted");
+            if (this.pivotFmts != null)
+                this.pivotFmts.Write(sw, "pivotFmts");
             if (this.view3D != null)
                 this.view3D.Write(sw, "view3D");
             if (this.floor != null)
@@ -11349,13 +11326,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
                 this.dispBlanksAs.Write(sw, "dispBlanksAs");
             if (this.showDLblsOverMax != null)
                 this.showDLblsOverMax.Write(sw, "showDLblsOverMax");
-            if (this.pivotFmts != null)
-            {
-                foreach (CT_PivotFmt x in this.pivotFmts)
-                {
-                    x.Write(sw, "pivotFmts");
-                }
-            }
+            
             if (this.extLst != null)
             {
                 foreach (CT_Extension x in this.extLst)
@@ -11428,7 +11399,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         }
 
         [XmlElement(Order = 2)]
-        public List<CT_PivotFmt> pivotFmts
+        public CT_PivotFmts pivotFmts
         {
             get
             {
@@ -11747,7 +11718,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
             sw.Write(string.Format("<c:{0}", nodeName));
             sw.Write(">");
             if (this.name != null)
-                sw.Write(string.Format("<name>{0}</name>", this.name));
+                sw.Write(string.Format("<c:name>{0}</c:name>", this.name));
             if (this.fmtId != null)
                 this.fmtId.Write(sw, "fmtId");
             if (this.extLst != null)
@@ -11824,8 +11795,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
         private byte valField;
@@ -11882,8 +11852,7 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
         {
             sw.Write(string.Format("<c:{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "val", this.val);
-            sw.Write(">");
-            sw.Write(string.Format("</c:{0}>", nodeName));
+            sw.Write("/>");
         }
 
     }
@@ -11926,8 +11895,31 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
     [XmlRoot(Namespace = "http://schemas.openxmlformats.org/drawingml/2006/chart", IsNullable = true)]
     public class CT_Lvl
     {
-
         private List<CT_StrVal> ptField;
+
+        public static CT_Lvl Parse(XmlNode node, XmlNamespaceManager namespaceManager)
+        {
+            if (node == null)
+                return null;
+            CT_Lvl ctObj = new CT_Lvl();
+            ctObj.pt = new List<CT_StrVal>();
+            foreach (XmlNode childNode in node.ChildNodes)
+            {
+                if (childNode.LocalName == "pt")
+                    ctObj.pt.Add(CT_StrVal.Parse(childNode, namespaceManager));
+            }
+            return ctObj;
+        }
+
+        internal void Write(StreamWriter sw, string nodeName)
+        {
+            sw.Write(string.Format("<c:{0}>", nodeName));
+            foreach (CT_StrVal x in this.pt)
+            {
+                x.Write(sw, "pt");
+            }
+            sw.Write(string.Format("</c:{0}>", nodeName));
+        }
 
         public CT_Lvl()
         {
@@ -12016,8 +12008,36 @@ namespace NPOI.OpenXmlFormats.Dml.Chart
     [XmlRoot(Namespace = "http://schemas.openxmlformats.org/drawingml/2006/chart", IsNullable = true)]
     public class CT_PivotFmts
     {
-
         private List<CT_PivotFmt> pivotFmtField;
+
+        public static CT_PivotFmts Parse(XmlNode node, XmlNamespaceManager namespaceManager)
+        {
+            if (node == null)
+                return null;
+            CT_PivotFmts ctObj = new CT_PivotFmts();
+            ctObj.pivotFmt = new List<CT_PivotFmt>();
+            foreach (XmlNode childNode in node.ChildNodes)
+            {
+                if (childNode.LocalName == "pivotFmt")
+                    ctObj.pivotFmt.Add(CT_PivotFmt.Parse(childNode, namespaceManager));
+            }
+            return ctObj;
+        }
+
+        internal void Write(StreamWriter sw, string nodeName)
+        {
+            if (this.pivotFmt.Count == 0)
+            {
+                return;
+            }
+
+            sw.Write(string.Format("<c:{0}>", nodeName));
+            foreach (CT_PivotFmt x in this.pivotFmt)
+            {
+                x.Write(sw, "pivotFmt");
+            }
+            sw.Write(string.Format("</c:{0}>", nodeName));
+        }
 
         public CT_PivotFmts()
         {

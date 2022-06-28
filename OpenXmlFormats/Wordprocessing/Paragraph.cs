@@ -245,15 +245,15 @@ namespace NPOI.OpenXmlFormats.Wordprocessing
         internal void Write(StreamWriter sw, string nodeName)
         {
             sw.Write(string.Format("<w:{0}", nodeName));
-            //XmlHelper.WriteAttribute(sw, "w14:paraId", this.paraIdField);
-            //XmlHelper.WriteAttribute(sw, "w14:textId", this.textIdField);
+            XmlHelper.WriteAttribute(sw, "w14:paraId", this.paraIdField);
+            XmlHelper.WriteAttribute(sw, "w14:textId", this.textIdField);
             XmlHelper.WriteAttribute(sw, "w:rsidR", this.rsidR);
             XmlHelper.WriteAttribute(sw, "w:rsidRPr", this.rsidRPr);
             XmlHelper.WriteAttribute(sw, "w:rsidRDefault", this.rsidRDefault);
             XmlHelper.WriteAttribute(sw, "w:rsidP", this.rsidP);
             XmlHelper.WriteAttribute(sw, "w:rsidDel", this.rsidDel);
             sw.Write(">");
-            if (this.pPr != null)
+            if (this.pPr != null&&!this.pPr.IsEmpty)
                 this.pPr.Write(sw, "pPr");
 
             int i = 0;
@@ -625,6 +625,11 @@ namespace NPOI.OpenXmlFormats.Wordprocessing
         public IList<CT_R> GetRList()
         {
             return GetObjectList<CT_R>(ParagraphItemsChoiceType.r);
+        }
+
+        public CT_R GetRArray(int pos)
+        {
+            return GetObjectArray<CT_R>(pos, ParagraphItemsChoiceType.r);
         }
 
         public int SizeOfBookmarkStartArray()
@@ -2487,7 +2492,7 @@ namespace NPOI.OpenXmlFormats.Wordprocessing
             
             //this.rtlGutterField = new CT_OnOff();
             //this.bidiField = new CT_OnOff();
-            this.textDirectionField = new CT_TextDirection();
+            //this.textDirectionField = new CT_TextDirection();
             //this.titlePgField = new CT_OnOff();
             //this.noEndnoteField = new CT_OnOff();
             //this.vAlignField = new CT_VerticalJc();
@@ -2495,7 +2500,7 @@ namespace NPOI.OpenXmlFormats.Wordprocessing
             this.colsField = new CT_Columns();
             this.cols.space = 425;
             this.cols.spaceSpecified = true;
-            this.pgNumTypeField = new CT_PageNumber();
+            //this.pgNumTypeField = new CT_PageNumber();
             //this.lnNumTypeField = new CT_LineNumber();
             //this.pgBordersField = new CT_PageBorders();
             //this.paperSrcField = new CT_PaperSource();
@@ -3571,9 +3576,9 @@ namespace NPOI.OpenXmlFormats.Wordprocessing
             XmlHelper.WriteAttribute(sw, "w:right", this.right);
             XmlHelper.WriteAttribute(sw, "w:hangingChars", this.hangingChars);
             XmlHelper.WriteAttribute(sw, "w:hanging", this.hanging);
-            XmlHelper.WriteAttribute(sw, "w:firstLineChars", this.firstLineChars);
             if(firstLineField>=0)
                 XmlHelper.WriteAttribute(sw, "w:firstLine", this.firstLine, true);
+            XmlHelper.WriteAttribute(sw, "w:firstLineChars", this.firstLineChars);
             sw.Write("/>");
         }
 
@@ -3999,7 +4004,11 @@ namespace NPOI.OpenXmlFormats.Wordprocessing
                 this.rPrChange.Write(sw, "rPrChange");
             sw.Write(string.Format("</w:{0}>", nodeName));
         }
-
+        public CT_String AddNewRStyle()
+        {
+            this.rStyleField = new CT_String();
+            return this.rStyleField;
+        }
         [XmlElement(Order = 0)]
         public CT_String rStyle
         {
@@ -4546,6 +4555,13 @@ namespace NPOI.OpenXmlFormats.Wordprocessing
             return this.bField;
         }
 
+        public CT_Shd AddNewShd()
+        {
+            if (this.shdField == null)
+                this.shdField = new CT_Shd();
+            return this.shdField;
+        }
+
         public CT_OnOff AddNewBCs()
         {
             if (this.bCsField == null)
@@ -4750,6 +4766,13 @@ namespace NPOI.OpenXmlFormats.Wordprocessing
             return this.spacingField != null;
         }
 
+        public CT_Highlight AddNewHighlight()
+        {
+            if (this.highlightField == null)
+                this.highlightField = new CT_Highlight();
+            return this.highlightField;
+        }
+
         public CT_SignedTwipsMeasure AddNewSpacing()
         {
             if (this.spacingField == null)
@@ -4760,12 +4783,6 @@ namespace NPOI.OpenXmlFormats.Wordprocessing
         public bool IsSetHighlight()
         {
             return this.highlightField != null;
-        }
-
-        internal CT_Highlight AddNewHighlight()
-        {
-            this.highlightField = new CT_Highlight();
-            return this.highlightField;
         }
     }
 

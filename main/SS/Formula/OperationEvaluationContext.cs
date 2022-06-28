@@ -25,8 +25,9 @@ namespace NPOI.SS.Formula
         private int _rowIndex;
         private int _columnIndex;
         private EvaluationTracker _tracker;
+        private bool _isSingleValue;
         private WorkbookEvaluator _bookEvaluator;
-
+        private bool _isInArrayContext;
         public OperationEvaluationContext(WorkbookEvaluator bookEvaluator, IEvaluationWorkbook workbook, int sheetIndex, int srcRowNum,
                 int srcColNum, EvaluationTracker tracker)
         {
@@ -37,12 +38,39 @@ namespace NPOI.SS.Formula
             _columnIndex = srcColNum;
             _tracker = tracker;
         }
-
+        public OperationEvaluationContext(WorkbookEvaluator bookEvaluator, IEvaluationWorkbook workbook, int sheetIndex, int srcRowNum,
+            int srcColNum, EvaluationTracker tracker, bool isSingleValue)
+        {
+            _bookEvaluator = bookEvaluator;
+            _workbook = workbook;
+            _sheetIndex = sheetIndex;
+            _rowIndex = srcRowNum;
+            _columnIndex = srcColNum;
+            _tracker = tracker;
+            _isSingleValue = isSingleValue;
+        }
+        public bool IsArraymode
+        {
+            get
+            {
+                return _isInArrayContext;
+            }
+            set {
+                _isInArrayContext = value;
+            }
+        }
         public IEvaluationWorkbook GetWorkbook()
         {
             return _workbook;
         }
 
+        public bool IsSingleValue
+        {
+            get
+            {
+                return _isSingleValue;
+            }
+        }
         public int RowIndex
         {
             get
@@ -366,6 +394,44 @@ namespace NPOI.SS.Formula
             SheetRangeEvaluator sre = CreateExternSheetRefEvaluator(aptg.SheetName, aptg.LastSheetName, aptg.ExternalWorkbookNumber);
             return new LazyAreaEval(aptg.FirstRow, aptg.FirstColumn,
                     aptg.LastRow, aptg.LastColumn, sre);
+        }
+        public ValueEval GetAreaValueEval(int firstRowIndex, int firstColumnIndex,
+         int lastRowIndex, int lastColumnIndex, Object[,] tokens)
+        {
+
+            ValueEval[] values = new ValueEval[tokens.GetLength(0) * tokens.GetLength(1)];
+
+            int index = 0;
+            for (int jdx = 0; jdx < tokens.GetLength(0); jdx++)
+            {
+                for (int idx = 0; idx < tokens.GetLength(1); idx++)
+                {
+                    values[index++] = convertObjectEval(tokens[jdx,idx]);
+                }
+            }
+
+            return new CacheAreaEval(firstRowIndex, firstColumnIndex, lastRowIndex,
+                                     lastColumnIndex, values);
+        }
+        private ValueEval convertObjectEval(Object token)
+        {
+            if (token == null)
+            {
+                throw new ArgumentNullException("Array item cannot be null");
+            }
+            if (token is String) {
+                return new StringEval((String)token);
+            }
+            if (token is Double) {
+                return new NumberEval(((Double)token));
+            }
+            if (token is Boolean) {
+                return BoolEval.ValueOf((Boolean)token);
+            }
+            if (token is Constant.ErrorConstant) {
+                return ErrorEval.ValueOf(((Constant.ErrorConstant)token).ErrorCode);
+            }
+            throw new ArgumentException("Unexpected constant class (" + token.GetType().Name + ")");
         }
         public ValueEval GetNameXEval(NameXPtg nameXPtg)
         {
