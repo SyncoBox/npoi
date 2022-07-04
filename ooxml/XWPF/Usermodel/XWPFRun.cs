@@ -1056,7 +1056,8 @@ namespace NPOI.XWPF.UserModel
             throw new NotImplementedException();
         }
 
-        XWPFPicture AddPicture(Stream pictureData, int pictureType, String filename, int width, int height, Action<XWPFDocument, CT_Blip> extAct)
+        XWPFPicture AddPicture(Stream pictureData, int pictureType, String filename, int width, int height, Action<XWPFDocument, CT_Blip> extAct,
+            int rotation = 0,bool flipH = false, bool flipV = false)
         {
             // Add the picture + relationship
             String relationId;
@@ -1147,7 +1148,10 @@ namespace NPOI.XWPF.UserModel
 
                 CT_ShapeProperties spPr = pic.AddNewSpPr();
                 CT_Transform2D xfrm = spPr.AddNewXfrm();
-
+                xfrm.rot = rotation;
+                xfrm.flipH = flipH;
+                xfrm.flipV = flipV;
+                
                 CT_Point2D off = xfrm.AddNewOff();
                 off.x = (0);
                 off.y = (0);
@@ -1214,9 +1218,9 @@ namespace NPOI.XWPF.UserModel
          * @throws NPOI.Openxml4j.exceptions.InvalidFormatException 
          * @throws IOException 
          */
-        public XWPFPicture AddPicture(Stream pictureData, int pictureType, String filename, int width, int height)
+        public XWPFPicture AddPicture(Stream pictureData, int pictureType, String filename, int width, int height,int rotation = 0,bool flipH = false,bool flipY = false)
         {
-            return AddPicture(pictureData, pictureType, filename, width, height, (doc, blip) => { });
+            return AddPicture(pictureData, pictureType, filename, width, height, (doc, blip) => { },rotation,flipH);
         }
 
         /**

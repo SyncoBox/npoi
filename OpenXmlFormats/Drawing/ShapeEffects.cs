@@ -2746,7 +2746,7 @@ namespace NPOI.OpenXmlFormats.Dml
         private uint dpiField;
         private bool dpiFieldSpecified;
 
-        private bool rotWithShapeField;
+        private bool rotWithShapeField = true;
 
         private bool rotWithShapeFieldSpecified;
 
