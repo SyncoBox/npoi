@@ -2505,9 +2505,9 @@ namespace NPOI.OpenXmlFormats.Wordprocessing
             //this.pgBordersField = new CT_PageBorders();
             //this.paperSrcField = new CT_PaperSource();
             this.pgMarField = new CT_PageMar();
-            this.pgMar.top = "1440";
+            this.pgMar.top = 1440;
             this.pgMar.right = 1800;
-            this.pgMar.bottom = "1440";
+            this.pgMar.bottom = 1440;
             this.pgMar.left = 1800;
             this.pgMar.header = 851;
             this.pgMar.footer = 992;
@@ -2849,6 +2849,11 @@ namespace NPOI.OpenXmlFormats.Wordprocessing
             {
                 this.rsidSectField = value;
             }
+        }
+        public CT_PageMar AddPageMar()
+        {
+            this.pgMar = new CT_PageMar();
+            return this.pgMar;
         }
         public CT_HdrFtrRef AddNewHeaderReference()
         {
@@ -7456,8 +7461,16 @@ cnfStyleField == null;
             CT_Br ctObj = new CT_Br();
             if (node.Attributes["w:type"] != null)
                 ctObj.type = (ST_BrType)Enum.Parse(typeof(ST_BrType), node.Attributes["w:type"].Value);
+            else
+                ctObj.type = ST_BrType.textWrapping; // Default value as http://officeopenxml.com/WPtextSpecialContent-break.php
+
             if (node.Attributes["w:clear"] != null)
                 ctObj.clear = (ST_BrClear)Enum.Parse(typeof(ST_BrClear), node.Attributes["w:clear"].Value);
+            else
+            {
+                if (ctObj.type == ST_BrType.textWrapping)
+                    ctObj.clear = ST_BrClear.none;
+            }
             return ctObj;
         }
 

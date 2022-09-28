@@ -1,14 +1,7 @@
-## Statement about Russian Invasion War ##
-
-This project fully supports Ukraine people to fight against Russian army. This is definitely an invasion. Ukraine are actually China's friend for a long time. Most core parts of China aircraft carrier, airplane are provided by Ukraine companies. I DON'T see any reason that we should support Russia instead Ukraine.
-
-However, I don't wanna stop Russian developers from using NPOI. They are also victims. They cannot change Putin's or Russia Government's mind in any case. But if possible, Russian developers may help impact your government although it's risky. Thank you!
-
-NPOI
+What's NPOI
 ===================
 [![NuGet Badge](https://buildstats.info/nuget/NPOI)](https://www.nuget.org/packages/NPOI)
-[![Ko-Fi](https://img.shields.io/static/v1?style=flat-square&message=Support%20the%20Project&color=success&style=plastic&logo=ko-fi&label=$$)](https://ko-fi.com/tonyqus)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square&logo=Apache)](License.md)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square&logo=Apache)](LICENSE)
 [![traffic](https://api.segment.io/v1/pixel/track?data=ewogICJ3cml0ZUtleSI6ICJBV2NjaWd1UkhKODBuNkJ4WlI4cHRaRzBINzY0RmJObCIsCiAgInVzZXJJZCI6ICJ0b255cXVzIiwKICAiZXZlbnQiOiAiTlBPSSBIb21lcGFnZSIKfQ==
 )](#)
 <a href="https://github.com/nissl-lab/npoi/graphs/contributors">
@@ -22,11 +15,13 @@ This project is the .NET version of POI Java project. With NPOI, you can read/wr
 
 [Who is using NPOI?](https://github.com/nissl-lab/npoi/issues/705)
 
+About Donation
+============
+Since Github sponsorship is not supported in China so far, it's hard to get donation from Github channel. I'm strictly limiting my contribution time on NPOI these 2 years although it looks to be still maintained well. If you profits/benefits from NPOI and you believe it's useful, please [donate this project](https://github.com/nissl-lab/npoi/discussions/923). Thank you!
+
 Telegram User Group
 ================
 Join us on telegram: https://t.me/npoidevs
-
-NOTE: QQ or wechat is not recommended. 
 
 Get Started with NPOI
 ============
