@@ -113,6 +113,16 @@ namespace NPOI.XWPF.UserModel
                 return ctPic.spPr.xfrm.ext.cy;
             }
         }
+
+        public void FlipHorizontal(bool flipH = true)
+        {
+            ctPic.spPr.xfrm.flipH = flipH;
+        }
+
+        public void Rotate(int degree)
+        {
+            ctPic.spPr.xfrm.rot = degree;
+        }
     }
 
 }

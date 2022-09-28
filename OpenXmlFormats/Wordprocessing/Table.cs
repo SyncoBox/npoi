@@ -650,7 +650,10 @@ namespace NPOI.OpenXmlFormats.Wordprocessing
                     else
                         pos++;
                 }
+                index = pos;
             }
+            if(pos == p && index == -1)
+                index = items1Field.Count;
             return index;
         }
         private void RemoveItems1(Items1ChoiceType type, int p)
