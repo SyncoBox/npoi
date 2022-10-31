@@ -674,6 +674,7 @@ namespace NPOI.HSSF.UserModel
                 throw new ArgumentException("The workbook already contains a sheet named '" + name + "'");
             }
             ValidateSheetIndex(sheetIx);
+            WorkbookUtil.ValidateSheetName(name);
             workbook.SetSheetName(sheetIx, name);
         }
 
@@ -2338,6 +2339,11 @@ namespace NPOI.HSSF.UserModel
         public bool IsDate1904()
         {
             return Workbook.IsUsing1904DateWindowing;
+        }
+
+        public void Dispose()
+        {
+            this.Close();
         }
     }
 }

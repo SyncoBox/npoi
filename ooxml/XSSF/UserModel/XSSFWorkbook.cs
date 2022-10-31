@@ -1637,8 +1637,6 @@ namespace NPOI.XSSF.UserModel
             ValidateSheetIndex(sheetIndex);
             String oldSheetName = GetSheetName(sheetIndex);
 
-            // YK: Mimic Excel and silently tRuncate sheet names longer than 31 characters
-            if (sheetname != null && sheetname.Length > 31) sheetname = sheetname.Substring(0, 31);
             WorkbookUtil.ValidateSheetName(sheetname);
 
             // Do nothing if no change
@@ -2550,6 +2548,11 @@ namespace NPOI.XSSF.UserModel
         }
 
         #endregion
+
+        public void Dispose()
+        {
+            this.Close();
+        }
     }
 }
 

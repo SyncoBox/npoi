@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Xml;
 using NPOI.OpenXml4Net.Util;
 using System.IO;
+using EnumsNET;
 
 namespace NPOI.OpenXmlFormats.Spreadsheet
 {
@@ -140,23 +141,14 @@ namespace NPOI.OpenXmlFormats.Spreadsheet
 
         private bool showButtonField;
 
+        private CT_CustomFilters customFiltersField;
+
         public CT_FilterColumn()
         {
             this.hiddenButtonField = false;
             this.showButtonField = true;
         }
-        //[XmlAttribute]
-        //public object Item
-        //{
-        //    get
-        //    {
-        //        return this.itemField;
-        //    }
-        //    set
-        //    {
-        //        this.itemField = value;
-        //    }
-        //}
+
         [XmlAttribute]
         public uint colId
         {
@@ -196,6 +188,19 @@ namespace NPOI.OpenXmlFormats.Spreadsheet
             }
         }
 
+        [XmlAttribute]
+        public CT_CustomFilters customFilters
+        {
+            get
+            {
+                return this.customFiltersField;
+            }
+            set
+            {
+                this.customFiltersField = value;
+            }
+        }
+
         public static CT_FilterColumn Parse(XmlNode node, XmlNamespaceManager namespaceManager)
         {
             if (node == null)
@@ -204,12 +209,12 @@ namespace NPOI.OpenXmlFormats.Spreadsheet
             ctObj.colId = XmlHelper.ReadUInt(node.Attributes["colId"]);
             ctObj.hiddenButton = XmlHelper.ReadBool(node.Attributes["hiddenButton"]);
             ctObj.showButton = XmlHelper.ReadBool(node.Attributes["showButton"]);
-            //TODO: implement http://www.schemacentral.com/sc/ooxml/t-ssml_CT_FilterColumn.html
-            //foreach (XmlNode childNode in node.ChildNodes)
-            //{
-            //    if (childNode.LocalName == "Item")
-            //        ctObj.Item = new Object();
-            //}
+            
+            foreach (XmlNode childNode in node.ChildNodes)
+            {
+                if (childNode.LocalName == "customFilters")
+                    ctObj.customFilters = CT_CustomFilters.Parse(childNode, namespaceManager);
+            }
             return ctObj;
         }
 
@@ -219,10 +224,23 @@ namespace NPOI.OpenXmlFormats.Spreadsheet
         {
             sw.Write(string.Format("<{0}", nodeName));
             XmlHelper.WriteAttribute(sw, "colId", this.colId, true);
-            XmlHelper.WriteAttribute(sw, "hiddenButton", this.hiddenButton);
-            XmlHelper.WriteAttribute(sw, "showButton", this.showButton);
-            sw.Write(">");
-            sw.Write(string.Format("</{0}>", nodeName));
+            XmlHelper.WriteAttribute(sw, "hiddenButton", this.hiddenButton, false);
+            XmlHelper.WriteAttribute(sw, "showButton", this.showButton, false);
+
+            if (this.customFilters == null || this.customFilters.customFilter.Count == 0)
+            {
+                sw.Write("/>");
+            }
+            else
+            {
+                sw.Write(">");
+                if (this.customFilters != null && this.customFilters.customFilter.Count > 0)
+                {
+                    if (this.customFilters != null)
+                        this.customFilters.Write(sw, "customFilters");
+                }
+                sw.Write(string.Format("</{0}>", nodeName));
+            }
         }
 
     }
@@ -317,6 +335,46 @@ namespace NPOI.OpenXmlFormats.Spreadsheet
                 this.andField = value;
             }
         }
+
+        public static CT_CustomFilters Parse(XmlNode node, XmlNamespaceManager namespaceManager)
+        {
+            if (node == null)
+                return null;
+            CT_CustomFilters ctObj = new CT_CustomFilters();
+            if (node.Attributes["and"] != null)
+                ctObj.and = XmlHelper.ReadBool(node.Attributes["and"]);
+
+            ctObj.customFilterField = new List<CT_CustomFilter>();
+            foreach (XmlNode childNode in node.ChildNodes)
+            {
+                if (childNode.LocalName == "customFilter")
+                    ctObj.customFilter.Add(CT_CustomFilter.Parse(childNode, namespaceManager));
+            }
+            return ctObj;
+        }
+
+        internal void Write(StreamWriter sw, string nodeName)
+        {
+            sw.Write(string.Format("<{0}", nodeName));
+            XmlHelper.WriteAttribute(sw, "and", this.and, false);
+
+            if (this.customFilter == null || this.customFilter.Count == 0)
+            {
+                sw.Write("/>");
+            }
+            else
+            {
+                sw.Write(">");
+                if (this.customFilter != null && this.customFilter.Count > 0)
+                {
+                    foreach (CT_CustomFilter x in this.customFilter)
+                    {
+                        x.Write(sw, "customFilter");
+                    }
+                }
+                sw.Write(string.Format("</{0}>", nodeName));
+            }
+        }
     }
 
     public class CT_CustomFilter
@@ -354,6 +412,27 @@ namespace NPOI.OpenXmlFormats.Spreadsheet
             {
                 this.valField = value;
             }
+        }
+
+        public static CT_CustomFilter Parse(XmlNode node, XmlNamespaceManager namespaceManager)
+        {
+            if (node == null)
+                return null;
+            CT_CustomFilter ctObj = new CT_CustomFilter();
+            if (node.Attributes["operator"] != null 
+                && Enum.TryParse<ST_FilterOperator>(XmlHelper.ReadString(node.Attributes["operator"]), out ST_FilterOperator _operator))
+                ctObj.@operator = _operator;
+            if (node.Attributes["val"] != null)
+                ctObj.val = XmlHelper.ReadString(node.Attributes["val"]);
+            return ctObj;
+        }
+
+        internal void Write(StreamWriter sw, string nodeName)
+        {
+            sw.Write(string.Format("<{0}", nodeName));
+            XmlHelper.WriteAttribute(sw, "operator", this.@operator.ToString(), true);
+            XmlHelper.WriteAttribute(sw, "val", this.val, true);
+            sw.Write("/>");
         }
     }
 
@@ -1239,7 +1318,7 @@ namespace NPOI.OpenXmlFormats.Spreadsheet
             if (node.Attributes["dxfId"] != null)
                 ctObj.dxfId = XmlHelper.ReadUInt(node.Attributes["dxfId"]);
             if (node.Attributes["iconSet"] != null)
-                ctObj.iconSet = XmlHelper.GetEnumValueFromString<ST_IconSetType>(node.Attributes["iconSet"].Value);
+                ctObj.iconSet = Enums.Parse<ST_IconSetType>(node.Attributes["iconSet"].Value,false, EnumFormat.Description);
             if (node.Attributes["iconId"] != null)
                 ctObj.iconId = XmlHelper.ReadUInt(node.Attributes["iconId"]);
             return ctObj;
@@ -1255,7 +1334,7 @@ namespace NPOI.OpenXmlFormats.Spreadsheet
             XmlHelper.WriteAttribute(sw, "ref", this.@ref);
             XmlHelper.WriteAttribute(sw, "customList", this.customList);
             XmlHelper.WriteAttribute(sw, "dxfId", this.dxfId);
-            XmlHelper.WriteAttribute(sw, "iconSet",  XmlHelper.GetEnumValue(this.iconSet));
+            XmlHelper.WriteAttribute(sw, "iconSet",  this.iconSet.AsString(EnumFormat.Description));
             XmlHelper.WriteAttribute(sw, "iconId", this.iconId);
             sw.Write("/>");
         }

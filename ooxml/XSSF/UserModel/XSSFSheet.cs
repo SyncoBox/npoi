@@ -507,6 +507,55 @@ namespace NPOI.XSSF.UserModel
                 columnHelper.SetColBestFit(column, true);
             }
         }
+
+        /**
+         * Adjusts the row height to fit the contents.
+         *
+         * This process can be relatively slow on large sheets, so this should
+         *  normally only be called once per row, at the end of your
+         *  Processing.
+         *
+         * @param row the row index
+         */
+        public void AutoSizeRow(int row)
+        {
+            AutoSizeRow(row, false);
+        }
+
+        /**
+         * Adjusts the row height to fit the contents.
+         * <p>
+         * This process can be relatively slow on large sheets, so this should
+         *  normally only be called once per row, at the end of your
+         *  Processing.
+         * </p>
+         * You can specify whether the content of merged cells should be considered or ignored.
+         *  Default is to ignore merged cells.
+         *
+         * @param row the row index
+         * @param useMergedCells whether to use the contents of merged cells when calculating the height of the row
+         */
+        public void AutoSizeRow(int row, bool useMergedCells)
+        {
+            var targetRow = GetRow(row) ?? CreateRow(row);
+
+            double height = SheetUtil.GetRowHeight(this, row, useMergedCells);
+            
+            if (height != -1 && height != 0)
+            {
+                height *= 20;
+
+                int maxRowHeight = 409 * 20; // The maximum row height for an individual cell is 409 points
+                
+                if (height > maxRowHeight)
+                {
+                    height = maxRowHeight;
+                }
+
+                targetRow.Height = (short)height;
+            }
+        }
+
         XSSFDrawing drawing = null;
         /**
          * Return the sheet's existing Drawing, or null if there isn't yet one.
@@ -3201,6 +3250,23 @@ namespace NPOI.XSSF.UserModel
         //YK: GetXYZArray() array accessors are deprecated in xmlbeans with JDK 1.5 support
         public void ShiftRows(int startRow, int endRow, int n, bool copyRowHeight, bool resetOriginalRowHeight)
         {
+            int sheetIndex = Workbook.GetSheetIndex(this);
+            String sheetName = Workbook.GetSheetName(sheetIndex);
+            FormulaShifter shifter = FormulaShifter.CreateForRowShift(
+                           sheetIndex, sheetName, startRow, endRow, n, SpreadsheetVersion.EXCEL2007);
+            removeOverwritten(startRow, endRow, n);
+            shiftCommentsAndRows(startRow, endRow, n, copyRowHeight);
+
+            XSSFRowShifter rowShifter = new XSSFRowShifter(this);
+            rowShifter.ShiftMergedRegions(startRow, endRow, n);
+            rowShifter.UpdateNamedRanges(shifter);
+            rowShifter.UpdateFormulas(shifter);
+            rowShifter.UpdateConditionalFormatting(shifter);
+            rowShifter.UpdateHyperlinks(shifter);
+            rebuildRows();
+        }
+        private void removeOverwritten(int startRow, int endRow, int n)
+        {
             XSSFVMLDrawing vml = GetVMLDrawing(false);
             List<int> rowsToRemove = new List<int>();
             List<CellAddress> commentsToRemove = new List<CellAddress>();
@@ -3269,78 +3335,9 @@ namespace NPOI.XSSF.UserModel
                 _rows.Remove(rowKey);
             }
             worksheet.sheetData.RemoveRows(ctRowsToRemove);
-            // then do the actual moving and also adjust comments/rowHeight
-            // we need to sort it in a way so the Shifting does not mess up the structures, 
-            // i.e. when Shifting down, start from down and go up, when Shifting up, vice-versa
-            SortedDictionary<XSSFComment, int> commentsToShift = new SortedDictionary<XSSFComment, int>(new ShiftCommentComparator(n));
-
-            foreach (KeyValuePair<int, XSSFRow> rowDict in _rows)
-            {
-                XSSFRow row = rowDict.Value;
-                int rownum = row.RowNum;
-
-                if (sheetComments != null)
-                {
-                    // calculate the new rownum
-                    int newrownum = ShiftedRowNum(startRow, endRow, n, rownum);
-
-                    // is there a change necessary for the current row?
-                    if (newrownum != rownum)
-                    {
-                        CT_CommentList lst = sheetComments.GetCTComments().commentList;
-                        foreach (CT_Comment comment in lst.comment)
-                        {
-                            String oldRef = comment.@ref;
-                            CellReference ref1 = new CellReference(oldRef);
-
-                            // is this comment part of the current row?
-                            if (ref1.Row == rownum)
-                            {
-                                XSSFComment xssfComment = new XSSFComment(sheetComments, comment,
-                                        vml == null ? null : vml.FindCommentShape(rownum, ref1.Col));
-
-                                // we should not perform the Shifting right here as we would then find
-                                // already Shifted comments and would shift them again...
-                                if (commentsToShift.ContainsKey(xssfComment))
-                                    commentsToShift[xssfComment] = newrownum;
-                                else
-                                    commentsToShift.Add(xssfComment, newrownum);
-                            }
-                        }
-                    }
-                }
-
-                if (rownum < startRow || rownum > endRow) continue;
-
-                if (!copyRowHeight)
-                {
-                    row.Height = (/*setter*/(short)-1);
-                }
-
-                row.Shift(n);
-            }
-
-            // adjust all the affected comment-structures now
-            // the Map is sorted and thus provides them in the order that we need here, 
-            // i.e. from down to up if Shifting down, vice-versa otherwise
-            foreach (KeyValuePair<XSSFComment, int> entry in commentsToShift)
-            {
-                entry.Key.Row = (/*setter*/entry.Value);
-            }
-
-            XSSFRowShifter rowShifter = new XSSFRowShifter(this);
-
-            int sheetIndex = Workbook.GetSheetIndex(this);
-            String sheetName = Workbook.GetSheetName(sheetIndex);
-            FormulaShifter shifter = FormulaShifter.CreateForRowShift(
-                                       sheetIndex, sheetName, startRow, endRow, n, SpreadsheetVersion.EXCEL2007);
-
-            rowShifter.UpdateNamedRanges(shifter);
-            rowShifter.UpdateFormulas(shifter);
-            rowShifter.ShiftMergedRegions(startRow, endRow, n);
-            rowShifter.UpdateConditionalFormatting(shifter);
-            rowShifter.UpdateHyperlinks(shifter);
-
+        }
+        private void rebuildRows()
+        {
             //rebuild the _rows map
             Dictionary<int, XSSFRow> map = new Dictionary<int, XSSFRow>();
             foreach (XSSFRow r in _rows.Values)
@@ -3358,6 +3355,62 @@ namespace NPOI.XSSF.UserModel
             // not found at poi 3.15
             if (worksheet.sheetData.row != null)
                 worksheet.sheetData.row.Sort((row1, row2) => row1.r.CompareTo(row2.r));
+        }
+        private void shiftCommentsAndRows(int startRow, int endRow, int n, bool copyRowHeight)
+        {
+            SortedDictionary<XSSFComment, int> commentsToShift = new SortedDictionary<XSSFComment, int>(new ShiftCommentComparator(n));
+
+            foreach (KeyValuePair<int, XSSFRow> rowDict in _rows)
+            {
+                XSSFRow row = rowDict.Value;
+                int rownum = row.RowNum;
+
+                if (sheetComments != null)
+                {
+                    // calculate the new rownum
+                    int newrownum = ShiftedRowNum(startRow, endRow, n, rownum);
+
+                    // is there a change necessary for the current row?
+                    if (newrownum != rownum)
+                    {
+                        var commentAddresses = sheetComments.GetCellAddresses();
+                        foreach (var cellAddress in commentAddresses)
+                        {
+                            if (cellAddress.Row == rownum)
+                            {
+                                XSSFComment oldComment = sheetComments.FindCellComment(cellAddress);
+                                if (oldComment!=null)
+                                {
+                                    XSSFComment xssfComment = new XSSFComment(sheetComments, oldComment.GetCTComment(),
+                                       oldComment.GetCTShape());
+                                    if (commentsToShift.ContainsKey(xssfComment))
+                                        commentsToShift[xssfComment] = newrownum;
+                                    else
+                                        commentsToShift.Add(xssfComment, newrownum);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (rownum < startRow || rownum > endRow) continue;
+
+                if (!copyRowHeight)
+                {
+                    row.Height = (/*setter*/(short)-1);
+                } 
+
+                row.Shift(n);
+            }
+
+            // adjust all the affected comment-structures now
+            // the Map is sorted and thus provides them in the order that we need here, 
+            // i.e. from down to up if Shifting down, vice-versa otherwise
+            foreach (KeyValuePair<XSSFComment, int> entry in commentsToShift)
+            {
+                entry.Key.Row = entry.Value;
+            }
+            rebuildRows();
         }
         private class ShiftCommentComparator : IComparer<XSSFComment>
         {
