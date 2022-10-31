@@ -3757,7 +3757,8 @@ namespace NPOI.OpenXmlFormats.Wordprocessing
 
         public CT_TcPr AddNewTcPr()
         {
-            this.tcPrField = new CT_TcPr();
+            if(this.tcPr == null)
+                this.tcPrField = new CT_TcPr();
             return this.tcPrField;
         }
 
@@ -4790,6 +4791,11 @@ namespace NPOI.OpenXmlFormats.Wordprocessing
             }
         }
 
+        public CT_TcPr Clone()
+        {
+            return (CT_TcPr) MemberwiseClone();
+        }
+
     }
 
     
@@ -5020,7 +5026,8 @@ namespace NPOI.OpenXmlFormats.Wordprocessing
 
         public CT_VMerge AddNewVMerge()
         {
-            this.vMerge = new CT_VMerge();
+            if(this.vMerge == null)
+                this.vMerge = new CT_VMerge();
             return this.vMerge;
         }
 
