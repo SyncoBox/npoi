@@ -421,7 +421,35 @@ namespace TestCases.XWPF.UserModel
 	    
 	        Assert.AreEqual(origText, ext.Text);
 	    }
-
+        [Test]
+        public void TestCreateMultipleTable()
+        {
+            var document =  new XWPFDocument();
+            document.CreateTable(5, 5);
+            document.CreateTable(6, 6); 
+            document = XWPFTestDataSamples.WriteOutAndReadBack(document);
+            Assert.AreEqual(3, document.Tables.Count);
+        }
+        [Test]
+        public void TestCreate3MultipleTable()
+        {
+            var document =  new XWPFDocument();
+            document.CreateTable(5, 5);
+            var newTable = document.CreateTable(6, 6);
+            document.InsertTable(2, newTable);
+            document = XWPFTestDataSamples.WriteOutAndReadBack(document);
+            Assert.AreEqual(2, document.Tables.Count);
+        }
+        [Test]
+        public void TestInsertCopyTable()
+        {
+            var document =  new XWPFDocument();
+            var originalTable = document.CreateTable(5, 5);
+            var newTable = originalTable.Copy();
+            document.InsertTable(0, newTable); 
+            document = XWPFTestDataSamples.WriteOutAndReadBack(document);
+            Assert.AreEqual(2, document.Tables.Count);
+        }
     }
 
 }
